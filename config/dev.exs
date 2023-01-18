@@ -2,8 +2,8 @@ use Mix.Config
 
 # NOTE: this file contains some security keys/certs that are *not* secrets, and are only used for local development purposes.
 
-host = "hubs.local"
-cors_proxy_host = "hubs-proxy.local"
+host = "shadow.eclipsereality.com"
+cors_proxy_host = "shadow.eclipsereality.com"
 assets_host = "hubs-assets.local"
 link_host = "hubs-link.local"
 
@@ -23,10 +23,10 @@ config :ret, RetWeb.Endpoint,
     port: 4000,
     otp_app: :ret,
     cipher_suite: :strong,
-    keyfile: "#{File.cwd!()}/priv/dev-ssl.key",
-    certfile: "#{File.cwd!()}/priv/dev-ssl.cert"
+    keyfile: "#{File.cwd!()}/priv/cert/key.pem",
+    certfile: "#{File.cwd!()}/priv/cert/cert.pem"
   ],
-  cors_proxy_url: [scheme: "https", host: cors_proxy_host, port: 4000],
+  cors_proxy_url: [scheme: "https", host: cors_proxy_host, port: 3300],
   assets_url: [scheme: "https", host: assets_host, port: 4000],
   link_url: [scheme: "https", host: link_host, port: 4000],
   imgproxy_url: [scheme: "http", host: host, port: 5000],
@@ -165,7 +165,7 @@ websocket_hosts =
     "https://#{host}:4000 https://#{host}:8080 wss://#{host}:4000 wss://#{host}:8080 wss://#{host}:8989 wss://#{
       host
     }:9090 " <>
-    "wss://#{host}:4000 wss://#{host}:8080 https://#{host}:8080 https://hubs.local:8080 wss://hubs.local:8080"
+    "wss://#{host}:4000 wss://#{host}:8080 https://#{host}:8080 https://shadow.eclipsereality.com:8080 wss://shadow.eclipsereality.com:8080"
 
 config :ret, RetWeb.Plugs.AddCSP,
   script_src: asset_hosts,
@@ -182,7 +182,8 @@ config :ret, Ret.Mailer, adapter: Bamboo.LocalAdapter
 config :ret, RetWeb.Email, from: "info@hubs-mail.com"
 
 config :ret, Ret.PermsToken,
-  perms_key: (System.get_env("PERMS_KEY") || "") |> String.replace("\\n", "\n")
+  perms_key: "-----BEGIN PRIVATE KEY-----\nMIIEvwIBADANBgkqhkiG9w0BAQEFAASCBKkwggSlAgEAAoIBAQC9Sd21A7jbmXbE\nZ92pXENuICov7HXYCVKuBWe1q5spAyVVjVj5FF198gcC/TJwfiVYcQw8CrwAor16\nt1Hr6154cDmEnCRNyXmKZFOu7LRbvJc574gsuHA6HmzvPOmCiqNm4Ywge6mWAc4m\nNrIPFHiUSRz3IZZT38OSHvmELjiYmgkl5MmjD4QTJ46HIYY7ymJQDzlJJo+T765s\n9cnzRV1LYZgAMpNvjW+L36h/ohPvAXoWouOj6wz0+wMkq/N0gnNG58OVWF4jj9Ce\ny2DgrdfYIOOxgYrjYp3YujxelY93nj5LjAwn+hvXSoonSTGErV8D9cGm7iN7JoTj\nHFcjRj1DAgMBAAECggEBALY1mpOax6GsMmWRzhAvXkFt+O404qNZJhuZ3GFGlY9/\nFbsq2xC5h92q0xEPhjQ/WdeuyqYpdxvtjBPKz7MX2NJ6xQNgAppWbQbI2L0z4dHE\n0pXUe/MAgBeSHi6VJfqhVfW8+9Rw9agOiNDEKdbWT9P+JUHHNRv79Bh+dJXGoHhT\ncvfKGVbdgXiPCTSbmhkse7PtA8J+Wahw1uX03/uE/XMB7gUDaXcg5zhYeZjt6ZvX\nBx6q/FBz20d41ZCrwJGmHpE4kO2UJK9GBsRaeDv1BQshxwzlcem1ID94zhzdzcbX\nMENN9DA568n7CAOD+yz5nfy7uerVKwWnDA3e670ULCECgYEA/ABmXS0rIm/A+SaH\nnsK/N3tuarMUZbY2qFeyfpI3yM7nuLpy6ElXLRMQfrCFBRkVF+jTD9nZ16O9pJZ9\n779GEpltCXazd80MlgF36t8lgoubKMgXHRuUBCnB21D962lNgCfq2vZtLEcan8Sc\nfaJotUjMkS8HaCY5iHQM9lNAYjsCgYEAwEq7wEDZ6yuPJ+dBy4jkQY/DBEydCtPi\nXm34e3bZMi+35dnCwj60SkY7bgJoc9jiEonvXq3Y91SuLzFmx7vdHtHbwIfauS7z\n6wtwBszUtTpx5vhlS9nxHhFUqrCmOwqmtcUJs+ZEVsYKfj81SE28XmPFHhmMq48o\nNYJfOVpiGJkCgYAE6A0WK1b3qK1dLH7ffHM0pVaVBT+Ua2PNC0gSZs5nPoAMfLTY\nCPWFjyV3EgDFBKQAfyv81wUCydFbbwKstFCs9AfHc2QzJO7lzMmE7StRy14OATdR\n/cN4AUgg+Qa4mqhDooNUGBAwGIJQMgfJ+muHfA9flEbUpEniej/2W9CZGQKBgQCM\nm5kigclXj2iEszOHUzglQKxHjoYfDsSubBeQoF09t2rvZgZl51gKH8UBMj2SyHq3\nN6mTP+gxIvijhao0TwjnqmjYJf8n/k9aBekK7+hyBKSZUfUwO9N2OxIAJl/HOIii\nzcvEgpJiKTovCqU5k640DxxqYCBeqrWqOwTKeW7VsQKBgQDWTT1o6SzrsrU2JgDZ\nrigQqo5s+J+f3s903jD1XNngVRn1Yf8ST+6/OFc7MvFYPplfTYN18RFGYJi4eS+w\n5WWl0lE8xPsJFfdYBERqT5ZdoRMtXF/JYH7dddNIz54KUCIpS+nA/cU3RTItC3rj\nQ+fl1KzCx6hFw7+6pTSd4QTuBg==\n-----END PRIVATE KEY-----"
+
 
 config :ret, Ret.OAuthToken, oauth_token_key: ""
 
@@ -209,8 +210,8 @@ config :sentry,
 
 config :ret, Ret.Habitat, ip: "127.0.0.1", http_port: 9631
 
-dialog_hostname = System.get_env("DIALOG_HOSTNAME") || "dev-janus.reticulum.io"
-dialog_port = String.to_integer(System.get_env("DIALOG_PORT") || "443")
+dialog_hostname = System.get_env("DIALOG_HOSTNAME") || "shadow.eclipsereality.com"
+dialog_port = String.to_integer(System.get_env("DIALOG_PORT") || "4443")
 
 config :ret, Ret.JanusLoadStatus, default_janus_host: dialog_hostname, janus_port: dialog_port
 
